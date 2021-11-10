@@ -2,12 +2,13 @@ import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {CryptoCoinType} from '../../../APIs/CoinCapAPI';
 import NumberFormatter from '../../../utils/NumberFormatter';
+import PropTypes from 'prop-types';
 
-const CryptoCoinCell = ({coin}) => {
+const CryptoCoinCell = ({coin, coinPrice}) => {
   const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);;
 
   const price = NumberFormatter.MonetaryFormatter.format(
-    parseFloat(coin.priceUsd).toFixed(2), // Hay precios que son muy bajos. Como manejarlos?
+    parseFloat(coinPrice).toFixed(2), // Hay precios que son muy bajos. Como manejarlos?
   );
 
   const percentage = NumberFormatter.StandardFormatter.format(
@@ -36,6 +37,7 @@ const CryptoCoinCell = ({coin}) => {
 
 CryptoCoinCell.propTypes = {
   coin: CryptoCoinType,
+  coinPrice: PropTypes.string,
 };
 
 export default CryptoCoinCell;
