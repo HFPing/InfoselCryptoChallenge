@@ -15,6 +15,30 @@ export default {
     const assetsFetchUrl = `${BASE_URL}${ASSETS_ENDPOINT}`;
     return fetch(assetsFetchUrl, API_OPTIONS).then(res => res.json());
   },
+  openPricesWebSocketConnection: onDataReceived => {
+    var ws = new WebSocket('wss://ws.coincap.io/prices?assets=ALL');
+
+    ws.onopen = () => {
+      console.log('Connection was opened');
+    };
+
+    ws.onmessage = e => {
+      // a message was received\
+      onDataReceived(JSON.parse(e.data));
+    };
+
+    ws.onerror = e => {
+      // an error occurred
+      console.log('Error', e.message);
+    };
+
+    ws.onclose = e => {
+      // connection closed
+      console.log('closed', e);
+    };
+
+    return ws;
+  },
 };
 
 export const CryptoCoinType = PropTypes.shape({
