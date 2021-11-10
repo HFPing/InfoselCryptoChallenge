@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import {COIN_CAP_KEY} from '@env';
 
 const API_OPTIONS = {
@@ -15,3 +16,18 @@ export default {
     return fetch(assetsFetchUrl, API_OPTIONS).then(res => res.json());
   },
 };
+
+export const CryptoCoinType = PropTypes.shape({
+  id: PropTypes.string,
+  rank: PropTypes.string,
+  symbol: PropTypes.string,
+  name: PropTypes.string,
+  supply: PropTypes.string,
+  maxSupply: PropTypes.string,
+  marketCapUsd: PropTypes.string,
+  volumeUsd24Hr: PropTypes.string,
+  priceUsd: PropTypes.string,
+  changePercent24Hr: PropTypes.string,
+  vwap24Hr: PropTypes.string,
+  explorer: PropTypes.string,
+});
