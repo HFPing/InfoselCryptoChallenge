@@ -9,12 +9,40 @@ const API_OPTIONS = {
 
 const BASE_URL = 'https://api.coincap.io';
 const ASSETS_ENDPOINT = '/v2/assets';
+const ASSET_HISTORY_ENDPOINT = ASSETS_ENDPOINT + '/{{id}}/history';
+
+/**
+ * Callback for handling price update messages from the Web Socket connection
+ * @callback onDataReceived
+ * @param {object} message Price updates from the websocket
+ */
 
 export default {
+  /**
+   * Download all assets
+   * @returns {Promise<[CryptoCoinType]>} Promise with an array of Assets
+   */
   getAssets: () => {
     const assetsFetchUrl = `${BASE_URL}${ASSETS_ENDPOINT}`;
     return fetch(assetsFetchUrl, API_OPTIONS).then(res => res.json());
   },
+  /**
+   * Fetch an asset historic data
+   * @param {string} id Asset ID
+   * @returns {Promise<[CryptoCoinHistoryType]>} Promise with an array of Assets
+   */
+  getAssetHistory: id => {
+    const endpoint = ASSET_HISTORY_ENDPOINT.replace('{{id}}', id);
+    const historyFetchUrl = `${BASE_URL}${endpoint}?interval=d1`;
+    return fetch(historyFetchUrl, API_OPTIONS)
+      .then(res => res.json())
+      .then(res => res.data);
+  },
+  /**
+   * Opens price changes websocket connection
+   * @param {onDataReceived} onDataReceived Callback for handling messages
+   * @returns {WebSocket} Websocket connection
+   */
   openPricesWebSocketConnection: onDataReceived => {
     var ws = new WebSocket('wss://ws.coincap.io/prices?assets=ALL');
 
@@ -54,4 +82,10 @@ export const CryptoCoinType = PropTypes.shape({
   changePercent24Hr: PropTypes.string,
   vwap24Hr: PropTypes.string,
   explorer: PropTypes.string,
+});
+
+export const CryptoCoinHistoryType = PropTypes.shape({
+  date: PropTypes.string,
+  priceUsd: PropTypes.string,
+  time: PropTypes.number,
 });
