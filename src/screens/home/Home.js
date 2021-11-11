@@ -8,12 +8,14 @@ import {
   View,
   AppState,
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 import CoinCapAPI from '../../APIs/CoinCapAPI';
 import AssetsDescriptorHeder from './components/AssetsDescriptorHeder';
 import CoincapHeader from './components/CoincapHeader';
 import CryptoCoinCell from './components/CryptoCoinCell';
 import MarketSnapshotBar from './components/MarketSnapshotBar';
+import {NavigationActions} from '../Navigation';
 
 var wsConnection;
 
@@ -62,7 +64,7 @@ function reducer(state, action) {
   }
 }
 
-const Home = () => {
+const Home = ({navigation}) => {
   const [state, dispatch] = useReducer(reducer, {
     assetsArr: [],
     filteredAssets: [],
@@ -132,6 +134,10 @@ const Home = () => {
     });
   }
 
+  function onAssetSelected(asset) {
+    NavigationActions.goToAssetDetails(navigation, asset);
+  }
+
   return (
     <SafeAreaView style={styles.MainSafeArea}>
       <CoincapHeader
@@ -148,6 +154,7 @@ const Home = () => {
             coin={item}
             coinPrice={state.assetsPrice[item.id]}
             priceVariation={state.pricesDifferences[item.id]}
+            onPress={onAssetSelected}
           />
         )}
         ItemSeparatorComponent={() => <View style={styles.Separator} />}
@@ -155,6 +162,12 @@ const Home = () => {
       />
     </SafeAreaView>
   );
+};
+
+Home.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default Home;

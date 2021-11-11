@@ -1,11 +1,11 @@
 import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import PropTypes from 'prop-types';
 
 import {CryptoCoinType} from '../../../APIs/CoinCapAPI';
 import NumberFormatter from '../../../utils/NumberFormatter';
 
-const CryptoCoinCell = ({coin, coinPrice, priceVariation}) => {
+const CryptoCoinCell = ({coin, coinPrice, priceVariation, onPress}) => {
   const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);
 
   let mainStyle = [styles.Main];
@@ -29,7 +29,7 @@ const CryptoCoinCell = ({coin, coinPrice, priceVariation}) => {
       : styles.TextPositivePercentage;
 
   return (
-    <View style={mainStyle}>
+    <TouchableOpacity style={mainStyle} onPress={() => onPress(coin)}>
       <Image style={styles.CoinIcon} source={icon} />
       <View style={styles.DescriptionView}>
         <Text style={styles.TextName}>{coin.name}</Text>
@@ -39,7 +39,7 @@ const CryptoCoinCell = ({coin, coinPrice, priceVariation}) => {
       <Text style={[styles.TextPercentage, percentageSignStyle]}>
         {percentage}%
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -47,6 +47,7 @@ CryptoCoinCell.propTypes = {
   coin: CryptoCoinType,
   coinPrice: PropTypes.string,
   priceVariation: PropTypes.number,
+  onPress: PropTypes.func,
 };
 
 export default CryptoCoinCell;
