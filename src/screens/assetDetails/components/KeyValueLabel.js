@@ -22,9 +22,14 @@ const styles = StyleSheet.create({
   Main: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    marginVertical: 8,
   },
   KeyText: {
-    marginRight: 16,
+    marginRight: 12,
+    color: '#999',
+    fontWeight: 'bold',
   },
-  ValueText: {},
+  ValueText: {
+    fontWeight: '600',
+  },
 });
