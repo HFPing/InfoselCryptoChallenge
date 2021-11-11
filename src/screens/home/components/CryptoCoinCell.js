@@ -1,8 +1,9 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
+import PropTypes from 'prop-types';
+
 import {CryptoCoinType} from '../../../APIs/CoinCapAPI';
 import NumberFormatter from '../../../utils/NumberFormatter';
-import PropTypes from 'prop-types';
 
 const CryptoCoinCell = ({coin, coinPrice, priceVariation}) => {
   const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);

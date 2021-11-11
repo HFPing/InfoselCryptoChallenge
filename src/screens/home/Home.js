@@ -19,9 +19,8 @@ var wsConnection;
 
 const ACTION_TYPES = {
   updatePriceAndAssets: 0,
-  updatePrice: 1,
-  updateRTData: 2,
-  updatePricesDifferences: 3,
+  updateRTData: 1,
+  filterDataByQuery: 2,
 };
 
 function reducer(state, action) {
@@ -30,6 +29,7 @@ function reducer(state, action) {
       return {
         ...state,
         assetsArr: action.assetsArr,
+        filteredAssets: action.assetsArr,
         assetsPrice: action.assetsPrice,
       };
     case ACTION_TYPES.updateRTData:
@@ -48,6 +48,15 @@ function reducer(state, action) {
         rtData: action.rtData,
         pricesDifferences: newDifferences,
       };
+    case ACTION_TYPES.filterDataByQuery:
+      const filteredAssets = state.assetsArr.filter(asset =>
+        asset.name.toLowerCase().includes(action.query.toLowerCase()),
+      );
+      return {
+        ...state,
+        filteredAssets,
+        filterText: action.query,
+      };
     default:
       return state;
   }
@@ -56,9 +65,11 @@ function reducer(state, action) {
 const Home = () => {
   const [state, dispatch] = useReducer(reducer, {
     assetsArr: [],
+    filteredAssets: [],
     rtData: {},
     assetsPrice: {},
     pricesDifferences: {},
+    filterText: '',
   });
 
   const appState = useRef(AppState.currentState);
@@ -114,13 +125,23 @@ const Home = () => {
     });
   }
 
+  function onNewQuery(query) {
+    dispatch({
+      type: ACTION_TYPES.filterDataByQuery,
+      query,
+    });
+  }
+
   return (
     <SafeAreaView style={styles.MainSafeArea}>
-      <CoincapHeader />
+      <CoincapHeader
+        searchQuery={state.filterText}
+        onSearchChanged={onNewQuery}
+      />
       <MarketSnapshotBar />
       <AssetsDescriptorHeder />
       <FlatList
-        data={state.assetsArr}
+        data={state.filteredAssets}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
           <CryptoCoinCell
