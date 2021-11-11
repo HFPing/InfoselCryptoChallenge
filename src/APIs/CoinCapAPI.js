@@ -33,7 +33,7 @@ export default {
    */
   getAssetHistory: id => {
     const endpoint = ASSET_HISTORY_ENDPOINT.replace('{{id}}', id);
-    const historyFetchUrl = `${BASE_URL}${endpoint}?interval=d1`;
+    const historyFetchUrl = `${BASE_URL}${endpoint}?interval=h1`;
     return fetch(historyFetchUrl, API_OPTIONS)
       .then(res => res.json())
       .then(res => res.data);
