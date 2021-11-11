@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import {CryptoCoinType} from '../../APIs/CoinCapAPI';
+import CoinCapAPI, {CryptoCoinType} from '../../APIs/CoinCapAPI';
 import KeyValueLabel from './components/KeyValueLabel';
+import {useEffect} from 'react/cjs/react.development';
+import NumberFormatter from '../../utils/NumberFormatter';
 
 const assetImage = require(`../../assets/smallIcons/${'BTC'}s.png`);
 
@@ -20,6 +22,35 @@ const AssetDetails = ({
     params: {asset},
   },
 }) => {
+  const [state, setState] = useState({historicData: []});
+
+  useEffect(() => {
+    CoinCapAPI.getAssetHistory(asset.id)
+      .then(data => {
+        const maxPrice = data.reduce(
+          (max, price) => Math.max(max, price.priceUsd),
+          0.0,
+        );
+        const minPrice = data.reduce(
+          (min, price) => Math.min(min, price.priceUsd),
+          maxPrice,
+        );
+        const average =
+          data.reduce((acc, price) => acc + parseFloat(price.priceUsd), 0.0) /
+          data.length;
+
+        setState({
+          historicData: data,
+          maxPrice: NumberFormatter.MonetaryFormatter.format(maxPrice),
+          minPrice: NumberFormatter.MonetaryFormatter.format(minPrice),
+          average: NumberFormatter.MonetaryFormatter.format(average),
+        });
+      })
+      .catch(error => {
+        console.log('Error fetching historic data', error);
+      });
+  }, [asset]);
+
   return (
     <SafeAreaView style={styles.MainSafeArea}>
       <View>
@@ -32,12 +63,12 @@ const AssetDetails = ({
         </View>
         <View style={styles.DataView}>
           <View style={styles.DataColumnView}>
-            <KeyValueLabel keyText="HIGH" value="122" />
-            <KeyValueLabel keyText="LOW" value="122" />
+            <KeyValueLabel keyText="HIGH" value={state.maxPrice} />
+            <KeyValueLabel keyText="LOW" value={state.minPrice} />
           </View>
           <View style={styles.DataColumnView}>
-            <KeyValueLabel keyText="AVERAGE" value="122" />
-            <KeyValueLabel keyText="CHANGE" value="122" />
+            <KeyValueLabel keyText="AVERAGE" value={state.average} />
+            <KeyValueLabel keyText="CHANGE" value="Change in price here" />
           </View>
         </View>
       </View>
