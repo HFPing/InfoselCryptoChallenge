@@ -30,6 +30,10 @@ const chartConfig = {
   fillShadowGradient: 'red',
   fillShadowGradientOpacity: 1,
   color: opacity => `rgba(0, 0, 0, ${opacity})`,
+  propsForVerticalLabels: {
+    fontSize: 9,
+  },
+  decimalPlaces: 12,
 };
 
 const AssetDetails = ({
@@ -60,11 +64,20 @@ const AssetDetails = ({
           datasets.push(parseFloat(registry.priceUsd));
         });
 
-        const lastRegistry = data.pop();
-        const latestTime = moment(lastRegistry.time);
+        const lastIndex = data.pop();
+        const firstIndex = data[0];
+        const latestTime = moment(lastIndex.time);
+        const firstTime = moment(firstIndex.time);
 
-        for (let i = 0; i < 10; i++) {
-          labels.push(latestTime.subtract({hours: i}).format('ha'));
+        const difference = moment
+          .duration(latestTime.diff(firstTime))
+          .asHours();
+
+        const timeDivisions = 10;
+        const timeInterval = Math.round(difference / timeDivisions);
+
+        for (let i = 0; i < difference; i += timeInterval) {
+          labels.push(latestTime.subtract({hours: i}).format('D/M ha'));
         }
 
         setState({
@@ -111,15 +124,18 @@ const AssetDetails = ({
           <>
             <LineChart
               data={state.plotData}
-              width={screenWidth - 20}
+              width={screenWidth * 0.93}
               height={220}
               withDots={false}
               withVerticalLines={false}
               chartConfig={chartConfig}
-              yAxisLabel="$"
               verticalLabelRotation={45}
               segments={6}
-              xLabelsOffset={-10}
+              yAxisLabel="$"
+              xLabelsOffset={-14}
+              formatYLabel={number =>
+                NumberFormatter.chartPriceFormatter(number, 1)
+              }
               style={styles.Chart}
             />
             <Button title="More Details" />
