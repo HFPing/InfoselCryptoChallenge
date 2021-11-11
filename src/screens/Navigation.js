@@ -1,9 +1,11 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {Provider} from 'react-redux';
 
 import Home from './home/Home';
 import AssetDetails from './assetDetails/AssetDetails';
+import {Store} from '../redux/Store';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,4 +46,8 @@ const RootNavigation = () => {
   );
 };
 
-export default RootNavigation;
+export default () => (
+  <Provider store={Store}>
+    <RootNavigation />
+  </Provider>
+);
