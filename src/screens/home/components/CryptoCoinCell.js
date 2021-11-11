@@ -4,8 +4,15 @@ import {CryptoCoinType} from '../../../APIs/CoinCapAPI';
 import NumberFormatter from '../../../utils/NumberFormatter';
 import PropTypes from 'prop-types';
 
-const CryptoCoinCell = ({coin, coinPrice}) => {
-  const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);;
+const CryptoCoinCell = ({coin, coinPrice, priceVariation}) => {
+  const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);
+
+  let mainStyle = [styles.Main];
+  if (priceVariation !== undefined) {
+    priceVariation > 0
+      ? mainStyle.push(styles.PositiveVariation)
+      : mainStyle.push(styles.NegativeVariation);
+  }
 
   const price = NumberFormatter.MonetaryFormatter.format(
     parseFloat(coinPrice).toFixed(2), // Hay precios que son muy bajos. Como manejarlos?
@@ -21,7 +28,7 @@ const CryptoCoinCell = ({coin, coinPrice}) => {
       : styles.TextPositivePercentage;
 
   return (
-    <View style={styles.Main}>
+    <View style={mainStyle}>
       <Image style={styles.CoinIcon} source={icon} />
       <View style={styles.DescriptionView}>
         <Text style={styles.TextName}>{coin.name}</Text>
@@ -38,6 +45,7 @@ const CryptoCoinCell = ({coin, coinPrice}) => {
 CryptoCoinCell.propTypes = {
   coin: CryptoCoinType,
   coinPrice: PropTypes.string,
+  priceVariation: PropTypes.number,
 };
 
 export default CryptoCoinCell;
@@ -49,6 +57,12 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingHorizontal: 20,
     alignItems: 'center',
+  },
+  PositiveVariation: {
+    backgroundColor: '#00ff0033',
+  },
+  NegativeVariation: {
+    backgroundColor: '#ff000033',
   },
   CoinIcon: {
     width: 24,

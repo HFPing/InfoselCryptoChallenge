@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useReducer, useRef} from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -17,10 +17,50 @@ import MarketSnapshotBar from './components/MarketSnapshotBar';
 
 var wsConnection;
 
+const ACTION_TYPES = {
+  updatePriceAndAssets: 0,
+  updatePrice: 1,
+  updateRTData: 2,
+  updatePricesDifferences: 3,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case ACTION_TYPES.updatePriceAndAssets:
+      return {
+        ...state,
+        assetsArr: action.assetsArr,
+        assetsPrice: action.assetsPrice,
+      };
+    case ACTION_TYPES.updateRTData:
+      let newDifferences = {...state.pricesDifferences};
+      Object.keys(action.rtData).forEach(key => {
+        if (state.assetsPrice[key] === undefined) {
+          newDifferences[key] = 0;
+        } else {
+          newDifferences[key] =
+            parseFloat(action.rtData[key]) - parseFloat(state.assetsPrice[key]);
+        }
+      });
+      return {
+        ...state,
+        assetsPrice: {...state.assetsPrice, ...action.rtData},
+        rtData: action.rtData,
+        pricesDifferences: newDifferences,
+      };
+    default:
+      return state;
+  }
+}
+
 const Home = () => {
-  let [assetsData, setAssetsData] = useState([]);
-  let [rtData, setRTData] = useState({});
-  let [assetsPrice, setAssetsPrice] = useState({});
+  const [state, dispatch] = useReducer(reducer, {
+    assetsArr: [],
+    rtData: {},
+    assetsPrice: {},
+    pricesDifferences: {},
+  });
+
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
@@ -30,8 +70,12 @@ const Home = () => {
         result.data.forEach(
           asset => (assetsPriceInit[asset.id] = asset.priceUsd),
         );
-        setAssetsPrice(assetsPriceInit);
-        setAssetsData(result.data);
+
+        dispatch({
+          type: ACTION_TYPES.updatePriceAndAssets,
+          assetsArr: result.data,
+          assetsPrice: assetsPriceInit,
+        });
 
         setUpWebSocketServiceHandler();
       })
@@ -39,10 +83,6 @@ const Home = () => {
         console.log('Assets fetch error', error);
       });
   }, []);
-
-  useEffect(() => {
-    setAssetsPrice(previous => ({...previous, ...rtData}));
-  }, [rtData]);
 
   function setUpWebSocketServiceHandler() {
     wsConnection = CoinCapAPI.openPricesWebSocketConnection(onNewPricesUpdated);
@@ -68,10 +108,11 @@ const Home = () => {
   }
 
   function onNewPricesUpdated(wsData) {
-    setRTData(wsData);
+    dispatch({
+      type: ACTION_TYPES.updateRTData,
+      rtData: wsData,
+    });
   }
-
-  console.log('render', rtData);
 
   return (
     <SafeAreaView style={styles.MainSafeArea}>
@@ -79,13 +120,17 @@ const Home = () => {
       <MarketSnapshotBar />
       <AssetsDescriptorHeder />
       <FlatList
-        data={assetsData}
+        data={state.assetsArr}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
-          <CryptoCoinCell coin={item} coinPrice={assetsPrice[item.id]} />
+          <CryptoCoinCell
+            coin={item}
+            coinPrice={state.assetsPrice[item.id]}
+            priceVariation={state.pricesDifferences[item.id]}
+          />
         )}
         ItemSeparatorComponent={() => <View style={styles.Separator} />}
-        extraData={assetsPrice}
+        extraData={state.assetsPrice}
       />
     </SafeAreaView>
   );
