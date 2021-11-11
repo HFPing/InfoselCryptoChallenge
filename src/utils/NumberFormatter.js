@@ -10,6 +10,11 @@ const StandardFormatter = new Intl.NumberFormat('en-US', {
   notation: 'standard',
 });
 
+const LowDecimalsStandardFormatter = new Intl.NumberFormat('en-US', {
+  notation: 'standard',
+  minimumFractionDigits: 5,
+});
+
 const lookup = [
   {value: 1e-6, symbol: 'm¢'},
   {value: 1e-3, symbol: '¢'},
@@ -34,5 +39,6 @@ const chartPriceFormatter = (num, digits) => {
 export default {
   MonetaryFormatter,
   StandardFormatter,
+  LowDecimalsStandardFormatter,
   chartPriceFormatter,
 };

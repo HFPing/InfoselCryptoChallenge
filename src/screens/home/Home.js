@@ -9,6 +9,7 @@ import {
   AppState,
 } from 'react-native';
 import PropTypes from 'prop-types';
+import {useDispatch} from 'react-redux';
 
 import CoinCapAPI from '../../APIs/CoinCapAPI';
 import AssetsDescriptorHeder from './components/AssetsDescriptorHeder';
@@ -16,6 +17,7 @@ import CoincapHeader from './components/CoincapHeader';
 import CryptoCoinCell from './components/CryptoCoinCell';
 import MarketSnapshotBar from './components/MarketSnapshotBar';
 import {NavigationActions} from '../Navigation';
+import {Actions} from '../../redux/Actions';
 
 var wsConnection;
 
@@ -41,7 +43,9 @@ function reducer(state, action) {
           newDifferences[key] = 0;
         } else {
           newDifferences[key] =
-            parseFloat(action.rtData[key]) - parseFloat(state.assetsPrice[key]);
+            (parseFloat(action.rtData[key]) -
+              parseFloat(state.assetsPrice[key])) /
+            parseFloat(state.assetsPrice[key]);
         }
       });
       return {
@@ -73,7 +77,7 @@ const Home = ({navigation}) => {
     pricesDifferences: {},
     filterText: '',
   });
-
+  const dispatchRedux = useDispatch();
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
@@ -96,6 +100,10 @@ const Home = ({navigation}) => {
         console.log('Assets fetch error', error);
       });
   }, []);
+
+  useEffect(() => {
+    dispatchRedux(Actions.setPriceDataAndDifferences(state.pricesDifferences));
+  }, [state.pricesDifferences, dispatchRedux]);
 
   function setUpWebSocketServiceHandler() {
     wsConnection = CoinCapAPI.openPricesWebSocketConnection(onNewPricesUpdated);

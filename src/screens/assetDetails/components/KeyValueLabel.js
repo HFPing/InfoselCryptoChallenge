@@ -2,11 +2,11 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import PropTypes from 'prop-types';
 
-const KeyValueLabel = ({keyText, value}) => {
+const KeyValueLabel = ({keyText, value, valueColor = 'black'}) => {
   return (
     <View style={styles.Main}>
       <Text style={styles.KeyText}>{keyText}</Text>
-      <Text style={styles.ValueText}>{value}</Text>
+      <Text style={[styles.ValueText, {color: valueColor}]}>{value}</Text>
     </View>
   );
 };
@@ -14,6 +14,7 @@ const KeyValueLabel = ({keyText, value}) => {
 KeyValueLabel.propTypes = {
   keyText: PropTypes.string,
   value: PropTypes.string,
+  valueColor: PropTypes.string,
 };
 
 export default KeyValueLabel;

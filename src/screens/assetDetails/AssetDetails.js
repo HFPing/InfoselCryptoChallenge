@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import {useSelector} from 'react-redux';
 import {LineChart} from 'react-native-chart-kit';
 
 import CoinCapAPI, {CryptoCoinType} from '../../APIs/CoinCapAPI';
@@ -42,6 +43,7 @@ const AssetDetails = ({
   },
 }) => {
   const [state, setState] = useState({});
+  const {priceDifferences} = useSelector(rxStore => rxStore.websocketReducer);
 
   useEffect(() => {
     CoinCapAPI.getAssetHistory(asset.id)
@@ -97,6 +99,11 @@ const AssetDetails = ({
 
   const screenWidth = useWindowDimensions().width;
 
+  const numDifference = (priceDifferences[asset.id] || 0) * 100;
+
+  const rtPriceVariation =
+    NumberFormatter.LowDecimalsStandardFormatter.format(numDifference);
+
   return (
     <SafeAreaView style={styles.MainSafeArea}>
       <ScrollView tyle={{flex: 1, alignItems: 'center'}}>
@@ -117,7 +124,11 @@ const AssetDetails = ({
           </View>
           <View style={styles.DataColumnView}>
             <KeyValueLabel keyText="AVERAGE" value={state.average} />
-            <KeyValueLabel keyText="CHANGE" value="Change in price here" />
+            <KeyValueLabel
+              keyText="CHANGE"
+              value={rtPriceVariation + '%'}
+              valueColor={numDifference > 0 ? 'green' : 'red'}
+            />
           </View>
         </View>
         {state.plotData !== undefined && (
