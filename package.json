@@ -4,12 +4,16 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "runAndroidDevice": "emulator -avd Pixel_5_API_30",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-navigation/native": "^6.0.6",
+    "@react-navigation/native-stack": "^6.2.5",
+    "add": "^2.0.6",
     "intl": "^1.2.5",
     "prop-types": "^15.7.2",
     "react": "17.0.2",
@@ -17,7 +21,10 @@
     "react-native-dotenv": "^3.3.0",
     "react-native-linear-gradient": "^2.5.6",
     "react-native-paper": "^4.10.0",
-    "react-native-vector-icons": "^9.0.0"
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-screens": "^3.9.0",
+    "react-native-vector-icons": "^9.0.0",
+    "yarn": "^1.22.17"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
