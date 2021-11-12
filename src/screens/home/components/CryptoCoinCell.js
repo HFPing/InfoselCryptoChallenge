@@ -1,12 +1,27 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import PropTypes from 'prop-types';
 
 import {CryptoCoinType} from '../../../APIs/CoinCapAPI';
+import PexelsAPI from '../../../APIs/PexelsAPI';
 import NumberFormatter from '../../../utils/NumberFormatter';
 
 const CryptoCoinCell = ({coin, coinPrice, priceVariation, onPress}) => {
-  const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);
+  // const icon = require(`../../../assets/smallIcons/${'BTC'}s.png`);
+  const [imageSource, setImageSource] = useState(
+    require(`../../../assets/smallIcons/${'BTC'}s.png`),
+  );
+
+  useEffect(() => {
+    PexelsAPI.getImageByQuery(coin.id)
+      .then(imgData => {
+        let imgURL = imgData.photos[0].src.tiny;
+        setImageSource({uri: imgURL})
+      })
+      .catch(e => {
+        console.log('Error fetching image data', e);
+      });
+  }, []);
 
   let mainStyle = [styles.Main];
   if (priceVariation !== undefined) {
@@ -30,7 +45,7 @@ const CryptoCoinCell = ({coin, coinPrice, priceVariation, onPress}) => {
 
   return (
     <TouchableOpacity style={mainStyle} onPress={() => onPress(coin)}>
-      <Image style={styles.CoinIcon} source={icon} />
+      <Image style={styles.CoinIcon} source={imageSource} />
       <View style={styles.DescriptionView}>
         <Text style={styles.TextName}>{coin.name}</Text>
         <Text style={styles.TextSymbol}>{coin.symbol}</Text>
