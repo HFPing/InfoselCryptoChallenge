@@ -32,7 +32,8 @@ COIN_CAP_KEY = key here
 1. Open terminal in repo directory
 2. Make sure the `.env` file is in the project root
 3. Execute `yarn install`
-4. Execute the project with `npx react-native run-ios` to open it in the iOS simulator, or `npx react-native run-android` for the android simulator
+4. Execute `pod install` in the ios project if you want to run the ios simulator
+5. Execute the project with `npx react-native run-ios` to open it in the iOS simulator, or `npx react-native run-android` for the android simulator
 
 ## Enhancements
 
